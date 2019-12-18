@@ -1,2 +1,116 @@
 2019 12 18 阴有雨 wed
-初始化块是java中的类里可出现的第四种成员（成员变量、方法和构造器）
+1.子类继承父类，实例化子类时，总会先执行父类的构造方法，父类无构造器则执行默认的无参构造方法；有自定义构造器则执行自定义的，子类必须显示调用父类的自定义构造器。
+
+2.初始化块是java中的类里可出现的第四种成员（成员变量、方法和构造器）
+初始化块在执行构造器之前执行
+public class Father {
+	{
+		a=6;
+	}
+	
+	int a=9;
+	
+	public static void main(String[] args) {
+		System.out.println(new Father().a);
+		//编译通过，输出9   ；如果赋值语句和代码块调换位置，则输出6
+	}
+}
+
+3.如果有一段初始化处理代码对所有对象完全相同，且无需接受任何参数，就可以把这段初始化处理代码提取到初始化代码块中
+
+4.初始化块是一个假象，使用javac编译java类后，java类中的初始化块会消失（初始化块中的代码会被“还原”到每个构造器中，且位于构造器所有代码的前面。
+
+5.与构造器类似，创建一个java对象时，不仅会执行该类的普通初始化块和构造器，而且系统会一直上溯到java.lang.Object，先执行Object类的初始化块，然后构造器......，最后执行该类的初始化块和构造器，返回该类的对象。Java系统加载并初始化某个类时，总是保证该类的所有父类（包括直接父类和间接父类）全部加载并初始化。
+
+6.静态初始化块，比普通初始块先执行，用于初始化类变量，不能初始化实例变量。
+
+7. 代码理解初始化过程
+class Root{
+	static {
+		System.out.println("Root 静态");
+	}
+	{
+		System.out.println("Root 普通");
+	}
+	public Root() {
+		System.out.println("Root无参构造器");
+	}
+}
+
+class Mid extends Root{
+	static {
+		System.out.println("Mid 静态");
+	}
+	{
+		System.out.println("Mid 普通");
+	}
+	public Mid() {
+		System.out.println("Mid无参构造器");
+	}
+	public Mid(String msg) {
+		this();
+		System.out.println("Mid带参构造器"+msg);
+	}
+}
+
+class Leaf extends Mid{
+	static {
+		System.out.println("Leaf 静态");
+	}
+	{
+		System.out.println("Leaf 普通");
+	}
+	public Leaf() {
+		super("java 讲义");
+		System.out.println("执行Leaf的构造器");
+	}
+}
+
+public class Father {
+	
+	public static void main(String[] args) {
+		new Leaf();
+		new Leaf();
+	}
+}
+
+8.  65 'A'  97 'a'
+
+9.
+public class Father {
+	public static void test() {
+		System.out.println("qasas");
+	}
+	public static void main(String[] args) {
+		Father fa=null;
+		fa.test();
+	}
+}
+不会报空指针，因为test方法为类方法，属于类，不属于对象
+
+10.final 修饰的成员变量必须由程序员显示地指定初始值，一旦有了初始值，该final变量的值就不能被重新赋值；
+	类成员变量：只能在静态初始化块或声明时初始化
+	实例变量：只能在非静态初始化块、声明时或构造器中初始化
+	都不能在普通方法中初始化
+
+11.不能在方法中对final形参进行赋值，只能在方法调用时，参数传递初始化
+
+12.final修饰基本类型变量时：值不可变；修饰引用类型变量：引用不可变
+
+13.Arrays.toString()  可以将一个数组转为字符串
+	final int[] a=new int[] {1,5,3,9,2};
+	Arrays.sort(a);
+	//[1, 2, 3, 5, 9]
+	System.out.println(Arrays.toString(a));
+
+14.可执行“宏替换”的final变量
+	String a="a";
+	String b="b";
+	String c=a+b;
+	String d="a"+"b";
+	final String e="a";
+	final String f="b";
+	String g=e+f;
+	System.out.println("ab"==c);//false
+	System.out.println("ab"==d);//true
+	System.out.println("ab"==g);//true
