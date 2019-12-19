@@ -1,0 +1,6 @@
+2019/12/19 多云 Thursday
+
+1.
+//Integer的valueOf方法缓存-128~127
+System.out.println(Integer.valueOf(1)==Integer.valueOf(1));//true
+System.out.println(Integer.valueOf(128)==Integer.valueOf(128));//false
