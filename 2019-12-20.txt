@@ -1,0 +1,66 @@
+2019-12-20  Friday  多云转晴
+
+1.静态内部类
+可以包含包含静态成员和非静态成员
+只能访问外部类的静态成员
+
+2.匿名内部类
+当创建匿名内部类时，必须实现接口或抽象父类的所有抽象方法。如果有需要，也可以重写父类中的普通方法。
+Thread thread=new Thread(new Runnable() {
+	@Override
+	public void run() {
+		
+	}
+});
+
+被匿名内部类访问的局部变量必须使用final修饰
+
+3.Lambda表达式
+可以简写匿名内部类
+Runnable a=new Runnable() {
+	@Override
+	public void run() {
+		for(int i=0;i<20;i++) {
+			System.out.println(i);
+		}
+	}
+};
+//利用Lambda表达式简写
+Runnable r = ()->{
+	for(int i=0;i<20;i++) {
+		System.out.println(i);
+	}
+};
+
+4.枚举类  enum
+枚举类继承了 java.lang.Enum类，不是Object
+使用enum定义、非抽象的枚举类默认使用final修饰，不能派生子类
+枚举类的构造器只能使用private修饰
+枚举类的所有实例必须在枚举类的第一行显示列出，系统自动添加public static final修饰
+enum Communication{
+	//必须定义在开头，会自动调用构造器
+	QQ("1") ,
+	WeChat("2"),
+	WeiBo("3") ;
+	private String code;
+	private Communication(String code) {
+		this.code=code;
+	}
+	public String getVal() {
+		return code;
+	}
+}
+
+5.访问修饰符  老是忘记
+public > protected(子类) > default（包） > private
+
+
+6.垃圾回收
+垃圾回收机制只负责回收堆内存中的对象，不会回收物理资源（如数据库连接、网络IO)
+程序无法精准控制垃圾回收的运行，垃圾回收会在合适的时候进行
+在垃圾回收机制回收任何对象之前，总会先调用它的 finalize() 方法，该方法可能使该对象重新复活（让一个引用变量重新引用该对象），从而导致垃圾回收机制取消回收
+对象在内存中的状态： 可达状态，可恢复状态，不可达状态
+
+强制垃圾回收  通知系统，但系统是否进行垃圾回收并不确定
+System.gc();
+Runtime.getRuntime().gc();
