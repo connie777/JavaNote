@@ -1,0 +1,133 @@
+2019-12-26 小雨
+
+1)List集合
+
+List判断2个对象相等的标准：两个对象的equals()返回true
+
+程序试图删除一个对象A,List会调用该A对象的equals()方法依次与集合元素比较，如果返回true,则删除
+		class A{
+			public boolean equals(Object o) {
+				return true;
+			}
+		}
+		public class Father {
+			public static void main(String[] args) {
+				List<Object> list=new ArrayList<Object>();
+				list.add("1");
+				list.add("2");
+				list.add("3");
+				System.out.println(list);//[1, 2, 3]
+				list.remove(new A());
+				System.out.println(list);//[2, 3]
+				list.remove(new A());
+				System.out.println(list);//[3]
+			}
+		}
+
+
+1.ArrayList线程不安全；Vector线程安全，性能差
+
+Stack，继承Vector，栈结构，后进先出（LIFO),最后push进栈的，最先被pop出栈
+Object peek();  返回栈的第一个元素
+Object pop(); 返回第一个元素，并pop出栈
+void push(Object o) 将一个元素push进栈
+线程安全，性能差
+
+2.LinkedList
+实现了List接口和Deque接口，可以根据索引随机访问；可以当做双端队列使用，当做“栈”或“队列”
+
+
+3.固定长度的List
+Arrays.asList(Object... a):可以把一个数组或指定个数的对象转换成一个List集合，这个List集合既不是ArrayList实现类的实例，也不是Vector实现类的实例，而是Arrays的内部类ArrayList的实例。
+Arrays.ArrayList 是一个固定长度的List集合，只能遍历访问集合的元素，不可增加、删除
+
+2)Queue集合
+模拟队列的数据结构，先进先出（FIFO)
+void add(Object o):将指定元素加入队列尾部
+Object element():获取队列头部元素
+boolean offer(Object e):将指定元素加入队列尾部,适用有容量限制的队列
+Object peek():获取队列头部元素
+Object poll():获取队列头部元素，并删除
+Object remove():获取队列头部元素，并删除
+
+PriorityQueue实现类
+是比较标准的队列实现类，因为PriorityQueue保存元素的顺序不是按照加入队列的顺序，而是按队列元素的大小重新排序
+
+Deque接口和ArrayDeque实现类
+Deque接口是Queue的子接口，它代表一个双端队列
+Deque不仅可以当成双端队列使用，而且可以被当成栈来使用，因为该接口定义了pop(出栈)、push(入栈)方法
+
+ArrayDeque 是Deque的实现类，基于数组实现
+建议使用ArrayDeque 实现栈，而不是Stack,因为Stack性能差（基础Vector)
+		Deque<String> stack=new ArrayDeque<String>();
+		stack.push("1");
+		stack.push("2");
+		stack.push("3");
+		//输出栈顶元素，不出栈
+		System.out.println(stack.peek());
+		//输出栈顶元素，出栈
+		System.out.println(stack.pop());
+
+模拟队列
+		Deque<String> queue=new ArrayDeque<String>();
+		//入队
+		queue.offer("1");
+		queue.offer("2");
+		queue.offer("3");
+		//访问队列头部元素
+		System.out.println(queue.peek());
+		//poll出头部元素
+		System.out.println(queue.poll())
+
+
+3）Map集合
+
+HashMap Hashtable 类似与ArrayList与Vector
+
+类似与HashSet,HashMap,Hashtable判断两个key相等的标准也是：两个key通过equals()方法返回true，两个key的hashCode值也相等
+
+containsValue():两个value通过equals()方法比较
+
+LinkedHashMap ,使用双向链表维护key-value的迭代次序（其实只考虑key的次序)；迭代顺序与插入顺序保持一致
+
+Properties类是HashTable的子类
+
+SortedMap接口和TreeMap实现类
+Map接口派生出一个SortedMap子接口，SortedMap接口也有一个TreeMap实现类
+TreeMap就是一个红黑树数据结构，每个key-value对 即作为红黑树的一个节点
+
+TreeMap也有两种排序方式
+自然排序：TreeMap的所有key必须实现Comparable接口，而且所有key应该是同一个类的对象
+
+定制排序：创建TreeMap时传入一个Comparator对象
+
+Set和Map的关系十分密切，Java源码就是先实现了HashMap、TreeMap等集合，然后通过包装一个所有的value都为null的Map集合实现了Set集合类。
+
+WeakHashMap实现类
+用法与HashMap类似。区别：HashMap的key保留了对实际对象的强引用：HashMap对象不销毁，该HashMap的所有key所引用的对象就不会被垃圾回收；WeakHashMap的key只保留了对实际对象的弱引用：如果key所引用的对象没有被其他强引用变量引用，则这些key所引用的对象可能被垃圾回收，WeakHashMap也可能自动删除这些key所对应的key-value对
+
+IdentityHashMap实现类
+当且仅当两个key严格相等（key1==key2)时，IdentityHashMap才认为两个key相等
+
+EnumMap实现类
+所有key都必须是单个枚举类的枚举值
+key不能为null
+
+Collections工具类
+List集合排序：
+void reverse(List list)
+void shuffle(List list) 模拟洗牌动作
+void sort(List list) 升序
+void sort(List list，Comparator c)
+void swap(List list，int i,int j) i和j的元素交换
+void rotate(List list,int distance):distanc为正数，将list集合的后distance个元素“整体”移到前面；负数，将前distance元素“整体”移到后面
+
+查找、替换
+int binarySearch(List list,Object key)
+查api
+
+同步控制
+Collection c=CollectionUtils.synchronizedCollection(new ArrayList());
+List list=CollectionUtils.synchronizedList(new ArrayList());
+Set s=CollectionUtils.synchronizedSet(new HashSet());
+Map p=CollectionUtils.synchronizedMap(new HashMap());

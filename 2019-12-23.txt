@@ -1,0 +1,302 @@
+2019-12-23 阴
+
+1.System.identityHashCode(Object o);
+根据对象的地址获取hashcode值，如果两个对象的identityHashCode值相同，则两个对象绝对是同一个对象
+
+2019-12-24 小雨
+
+2.BigDecimal类
+
+用于精确表示、计算浮点数
+
+建议使用BigDecimal(String val) 构造器，或BigDecimal.valueOf(double val)静态方法 创建BigDecimal对象
+
+BigDecimal f1=new BigDecimal("0.05");
+BigDecimal f2=BigDecimal.valueOf(0.01);
+System.out.println(f1.add(f2));
+System.out.println(f1.subtract(f2));
+System.out.println(f1.multiply(f2));
+System.out.println(f1.divide(f2));
+
+3.MessageFormat
+
+String str="桃李{0}下自{1}";
+System.out.println(MessageFormat.format(str, "不言","成蹊"));
+
+2019-12-25
+
+4.集合
+数组元素既可以是基本类型的值，也可以是对象（对象的应用变量），长度固定
+集合只能保存对象,基本类型会自动装箱成包装类
+
+Collection和Map是Java集合框架的根接口
+
+Collection 接口是List，Set和Queue接口的父接口
+
+Collection 接口定义的方法：
+boolean add(Object o)
+boolean addAll(Collection c)
+void clear()
+boolean contains(Object o)
+boolean containsAll(Collection c)
+boolean isEmpty();
+Iterator iterator()
+boolean remove(Object o)
+boolean retainAll(Collection c):从集合中删除集合c里不包含的元素（获取交集）
+int size()
+Object[] toArray()
+
+所有Collection实现类重写了toString()方法，可一次性输出集合中的所有元素
+
+Iterator 接口定义了4个方法
+boolean hasNext();
+Object next()
+void remove
+
+当使用Iterator对集合元素进行迭代时，Iterator并不是把集合元素本身传给迭代变量，而是集合元素的值，所以修改迭代变量的值对集合元素本身没有任何影响。
+	Collection<String> c=new HashSet<String>();
+	c.add("1");
+	c.add("2");
+	c.add("3");
+	Iterator<String> it=c.iterator();
+	while(it.hasNext()) {
+		String str=it.next();
+		if("1".equals(str)) {
+			//删除上一次next的元素
+			it.remove();
+		}
+		str="4";
+	}
+	System.out.println(c);//[2, 3]
+
+当使用Iterator迭代访问Collection集合元素时，Collection集合里的元素不能被改变，只有通过Iterator的remove（）方法删除上一次next（）方法返回的集合元素才可以。否则会引发java.util.ConcurrentModificationException异常
+	Collection<String> c=new HashSet<String>();
+	c.add("1");
+	c.add("2");
+	c.add("3");
+	Iterator<String> it=c.iterator();
+	while(it.hasNext()) {
+		String str=it.next();
+		if("1".equals(str)) {
+			//c.remove(str); 会报错
+			//c.add("4");  会报错
+			it.remove();
+		}
+	}
+
+Iterator 迭代器采用的是快速失败（fail-fast）机制，一旦在迭代过程中检测到该集合已经被修改（通常是程序中的其他线程修改），程序立即引发ConcurrentModificationException异常，这样可以避免共享资源而引发的潜在问题。
+
+foreach循环遍历集合元素
+foreach循环中的迭代变量也不是集合元素本身，只是集合元素的值
+	Collection<String> c=new HashSet<String>();
+	c.add("1");
+	c.add("2");
+	c.add("3");
+	for(String str :c) {
+		System.out.println(str);
+		if("1".equals(str)) {
+			//此处会引发ConcurrentModificationException
+			c.remove(str);
+		}
+	}
+
+jdk1.8 新增集合的批量删除 removeIf(Predicate p)
+	Collection<String> c=new HashSet<String>();
+	c.add("1");
+	c.add("123");
+	c.add("12");
+	c.removeIf(new Predicate<String>() {
+		@Override
+		public boolean test(String t) {
+			return t.length()<2;
+		}
+	});
+	System.out.println(c);//[12, 123]
+
+Predicate例子
+	public static void main(String[] args) {
+	Collection<String> c=new HashSet<String>();
+	c.add("轻量级Java EE企业应用实战");
+	c.add("疯狂Java讲义");
+	c.add("疯狂iOS讲义");
+	c.add("疯狂Ajax讲义");
+	c.add("疯狂Android讲义");
+	System.out.println(callAll(c,new Predicate<String>() {
+		@Override
+		public boolean test(String t) {
+			return t.contains("疯狂");
+		}
+	}));
+	System.out.println(callAll(c,new Predicate<String>() {
+		@Override
+		public boolean test(String t) {
+			return t.contains("Java");
+		}
+	}));
+	System.out.println(callAll(c,new Predicate<String>() {
+		@Override
+		public boolean test(String t) {
+			return t.length()>10;
+		}
+	}));
+	}
+
+	public static int callAll(Collection<String> c,Predicate<String> p) {
+		int total = 0;
+		for(String str :c) {
+			if(p.test(str)) {
+				total++;
+			}
+		}
+		return total;
+	}
+
+5.Set集合
+
+HashSet
+无序，线程不安全，元素值可以是null
+
+当向HashSet集合中存入一个元素时，HashSet会调用该对象的hashCode()方法来得到该对象的hashCode值，然后根据该hashCode值决定该对象在HashSet中的存储位置。
+
+HashSet集合判断两个元素相等的标准是两个对象通过equals()方法比较相等，而且两个对象的hashCode()方法返回值也相等。
+
+如果两个元素的hashCode()相同，但equals()不同，则会在某个位置用链式结构来保存多个对象；而HashSet访问集合元素是根据hashCode值来快速定位的，如果HashSet中两个以上的元素具有相同的hashCode值，会导致性能下降。
+
+如果需要把某个类的对象保存到HashSet集合中，重写这个类的equals()方法和hashCode()方法时，应尽量保证两个对象的equals() true时，hashCode()返回值也相等。
+		
+		class R{
+			int count;
+			public R(int count) {
+				this.count=count;
+			}
+			public String toString() {
+				return "R[count:"+count+"]";
+			}
+			public boolean equals(Object o) {
+				if(this==o) {
+					return true;
+				}
+				if(o!=null&&o.getClass()==R.class) {
+					R r=(R)o;
+					return this.count==r.count;
+				}
+				return false;
+			}
+			public int hashCode() {
+				return this.count;
+			}
+		}
+		HashSet<R> h=new HashSet<R>();
+		h.add(new R(5));
+		h.add(new R(-3));
+		h.add(new R(9));
+		h.add(new R(-2));
+		System.out.println(h.toString());	//[R[count:-2], R[count:-3], R[count:5], R[count:9]]
+		Iterator<R> it=h.iterator();
+		R first=it.next();
+		first.count=-3;
+		System.out.println(h.toString());	//[R[count:-3], R[count:-3], R[count:5], R[count:9]]
+		h.remove(new R(-3));
+		System.out.println(h.toString());	//[R[count:-3], R[count:5], R[count:9]]
+		System.out.println(h.contains(new R(-3)));	//false
+		System.out.println(h.contains(new R(-2)));	//false
+
+LinkedHashSet
+是HashSet的子类
+根据元素的hashCode值来决定元素的存储位置
+使用链表维护元素的插入顺序，性能略低于HashSet
+
+TreeSet
+实现SortedSet接口
+
+		TreeSet<Integer> nums=new TreeSet<Integer>();
+		nums.add(6);
+		nums.add(2);
+		nums.add(10);
+		nums.add(-9);
+		System.out.println(nums);	//[-9, 2, 6, 10]
+		System.out.println(nums.first());	//-9
+		System.out.println(nums.last());	//10
+		System.out.println(nums.headSet(4));	//[-9, 2]
+		System.out.println(nums.tailSet(5));	//[6, 10]
+		System.out.println(nums.subSet(-3, 4));	//[2]
+
+TreeSet并不是根据元素的插入顺序进行排序的，而是根据元素实际值的大小来进行排序
+与HashSet采用hash算法来决定元素的存储位置不同，TreeSet采用红黑树的数据结构来存储集合元素；TreeSet支持自然排序（默认）和定制排序
+
+试图把一个对象添加到TreeSet时，该对象必须实现Comparable接口，否则会抛出ClassCastException异常；
+java的一些常用类已经实现了Comparable接口：
+	BigDecimal、BigInteger以及所有的数值类型的包装类：按数值大小比较
+	Character：按字符的UNICODE值比较
+	Boolean：true对应的包装类实例大于false
+	String:按字符串中字符的UNICODE值进行比较
+	Date、Time：后面的时间比前面的大
+
+向TreeSet中添加的应该是同一个类的对象，否则也会引发ClassCastException
+
+当把一个对象加入TreeSet集合中时，TreeSet调用该对象的compareTo(Object o) 方法与容器中的其他对象比较大小，然后根据红黑树结构找到它的存储位置。如果两个对象通过compareTo方法比较相等，新对象将无法添加到TreeSet集合中
+
+		class M{
+			int age;
+			public M(int age) {
+				this.age=age;
+			}
+			@Override
+			public String toString() {
+				return "M [age=" + age + "]";
+			}	
+		}
+		public class Father {
+			public static void main(String[] args) {
+				TreeSet<M> nums=new TreeSet<M>(new Comparator<M>() {
+					@Override
+					public int compare(M o1, M o2) {
+						return o2.age-o1.age;
+					}
+					
+				});
+				nums.add(new M(5));
+				nums.add(new M(-3));
+				nums.add(new M(9));
+				System.out.println(nums);//[M [age=9], M [age=5], M [age=-3]]
+			}
+		}
+
+EnumSet
+		enum M{
+			QQ,
+			WeChat,
+			WeiBo,
+			TapTap;
+		}
+		public class Father {
+			public static void main(String[] args) {
+				EnumSet<M> set=EnumSet.allOf(M.class);
+				System.out.println(set);//[QQ, WeChat, WeiBo, TapTap]
+				EnumSet<M> set1=EnumSet.noneOf(M.class);
+				System.out.println(set1);//[]
+				set1.add(M.QQ);
+				set1.add(M.WeChat);
+				System.out.println(set1);//[QQ, WeChat]
+				EnumSet<M> set3=EnumSet.of(M.WeChat, M.WeiBo);
+				System.out.println(set3);//[WeChat, WeiBo]
+				EnumSet<M> set4=EnumSet.range(M.QQ, M.WeiBo);
+				System.out.println(set4);//[QQ, WeChat, WeiBo]
+				EnumSet<M> set5=EnumSet.complementOf(set4);
+				System.out.println(set5);//[TapTap]
+			}
+		}
+
+
+各Set实现类性能分析
+
+HashSet的性能总是比TreeSet好，因为TreeSet需要额外的红黑树算法来维护集合元素的次序。只有当需要一个保持排序的Set时，才应该使用TreeSet，否则都应该使用HashSet。
+
+LinkedHashSet，继承HashSet,由于维护了链表，所以普通的插入、删除略慢，但遍历会更快
+
+EnumSet是所有Set实现类中性能最好的，但它只能保存同一个枚举类的枚举值作为集合元素
+
+Set的三个实现类HashSet、TreeSet、EnumSet都是现场不安全的；多线程下，可以通过Collections工具类的synchronizedSortedSet方法在创建时来“包装”该Set集合，以防止非同步访问。
+例：SortedSet s= Collections.synchronizedSortedSet(new TreeSet());
+
+
