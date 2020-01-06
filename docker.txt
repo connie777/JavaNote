@@ -27,6 +27,7 @@ docker ps -a/docker container ls :查看正在运行的容器
 docker start/restart/stop container_name/container_id  启动、重启、停止容器
 docker attach container_name/container_id 进入容器
 docker run -t -i container_name/contain_id /bin/bash 运行容器并调用bash
-docker rm container_name/container_id 删除镜像，需要先停止容器
+docker rmi image_name 删除镜像
+docker rm container_name/container_id ，需要先停止容器，删除容器
 
 DockerFile :用来构建Docker镜像的构建文件，是由一系列命令和参数构成的脚本
