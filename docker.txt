@@ -1,0 +1,32 @@
+Docker 采用的是Client/Server架构。客户端向服务器发送请求，服务器负责构建、运行和分发容器。客户端和服务器可以运行在同一个Host上，客户端也可以通过socket或REST API与远程的服务器通信。
+
+Docker的核心组件
+1.Docker Client
+	Docker提供的命令行界面（CLI）工具，最常用的Docker客户端就是docker命令
+2.Docker daemon
+	是服务器组件，以Linux后台服务的方式运行，是docker最核心的后台进程，也称为守护进程。负责响应来自docker client的请求，然后将这些请求翻译成系统调用完成容器管理操作。
+	分为三部分：1）Docker Server 2）Engine 3）Job
+3.Docker Image
+	Docker镜像可以看作是一个特殊的文件系统，除了提供容器运行所需的程序、库、资源、配置等文件外，还包含了一些为运行时准备的一些配置参数。镜像不包含任何动态数据，其内容在构建之后也不会被改变。我们可以将Docker镜像看成只读模板，通过它可以创建docker容器。
+4.Docker Register
+	是存储docker image的仓库；运行docker push、docker pull、docker search时，实际是通过docker daemon与docker registry通信。
+5.Docker Container
+	docker容器就是docker镜像的运行实例，是真正运行项目程序、消耗系统资源、提供服务的地方。Docker Container提供了系统硬件环境。
+
+Docker组件协作运行容器过程：
+	1）Docker客户端执行docker run命令
+	2）Docker daemon发现本地没有我们需要的镜像
+	3）docker daemon从Docker Hub下载镜像
+	4）下载完成后，镜像被保存到本地
+	5）Docker daemon启动容器
+
+常用命令:
+docker images:查看镜像
+docker pull image_name : 拉取镜像
+docker ps -a/docker container ls :查看正在运行的容器
+docker start/restart/stop container_name/container_id  启动、重启、停止容器
+docker attach container_name/container_id 进入容器
+docker run -t -i container_name/contain_id /bin/bash 运行容器并调用bash
+docker rm container_name/container_id 删除镜像，需要先停止容器
+
+DockerFile :用来构建Docker镜像的构建文件，是由一系列命令和参数构成的脚本
