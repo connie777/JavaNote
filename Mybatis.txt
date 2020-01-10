@@ -1,0 +1,146 @@
+Mybatis
+1）#{} 与${}的区别
+	#{}是预编译处理，${}是字符串替换
+	Mybatis在处理#{}时，会将SQL中的#{}替换为?号，调用PreparedStatement的set方法来赋值。#{} 解析之后会将String类型的数据自动加上引号，其他数据类型不会。
+	Mybatis在处理${}时,就是把${}替换成变量的值。
+	使用#{}可以有效的防止SQL注入，提高安全性
+	某些特殊场合下只能用${}，不能用#{}。例如：在使用排序时ORDER BY ${id}，如果使用#{id}，则会被解析成ORDER BY “id”
+
+2）实体类属性名与表中字段名不一致怎么办？
+	1.在查询的SQL中定义字段的别名与实体类的属性名相同
+		<select id=”selectorder” parametertype=”int” resultetype=”me.gacl.domain.order”>
+			select order_id id, 
+			order_no orderno ,
+			order_price price 
+			form orders 
+			where order_id=#{id};
+		</select>
+	2.通过<resultMap>映射字段名和属性名的对应关系
+		<select id="getOrder" parameterType="int" resultMap="orderresultmap">
+			select * from orders where order_id=#{id}
+		</select>
+		<resultMap type=”me.gacl.domain.order” id=”orderresultmap”>
+			<!–用 id 属性来映射主键字段–>
+			<id property=”id” column=”order_id”>
+			<!–用 result 属性来映射非主键字段，property 为实体类属性名，column为数据表中的属性–>
+			<result property = “orderno” column =”order_no”/>
+			<result property=”price” column=”order_price” />
+		</reslutMap>
+
+3）模糊查询实现
+	1.SQL注入风险
+	<if test="name != null and name != ''">
+        AND name LIKE '%${name}%'
+    </if>
+    2.风险未知
+    <if test="name != null and name != ''">
+        AND name LIKE "%"#{name}"%"
+    </if>
+    3.安全，mysql支持
+    <if test="name != null and name != ''">
+        AND name LIKE CONCAT('%',#{name},'%')
+    </if>
+
+4）mybatis Dao接口的工作原理
+	当调用接口方法时，接口全限定名+方法名拼接字符串作为key值，可唯一定位一个MapperStatement。在Mybatis中，每一个<select>、<insert>、<update>、<delete>标签，都会被解析为一个MapperStatement对象。
+	例：com.StudentDao.findStudentById，可以唯一找到 namespace 为 com.StudentDao 下面 id 为findStudentById 的 MapperStatement。
+	Mapper接口的工作原理是JDK动态代理，Mybatis运行时会使用JDK动态代理为Mapper接口生成代理对象proxy，代理对象会拦截接口的方法，转而执行MapperStatement所代表的SQL，然后将SQL执行结果返回。
+
+5）Mybatis如何进行分页？分页插件原理？
+	Mybatis使用RowBounds对象进行分页，它是针对ResultSet结果集执行的内存分页，而非物理分页。可以在SQL内直接书写带有物理分页的参数来完成物理分页功能，也可以使用分页插件来完成物理分页。
+	分页插件的基本原理是使用Mybatis提供的插件接口，实现自定义插件，在插件的拦截方法内拦截待执行的SQL，然后重写SQL，根据dialect方言，添加对应的物理分页语句和参数。
+
+6）如何获取自动生成的（主）键值
+	insert方法总是返回一个int值，这个值代表的是插入的行数。如果采用自增长策略，自动生成的键值在insert方法执行完后可以被设置到传入的参数对象中。
+
+7）在mapper中传递多个参数
+	1.Dao层的函数
+		public User selectUser(String name,String area);
+		对应的 xml,#{0}代表接收的是 dao 层中的第一个参数，#{1}代表 dao 层中第二参数
+		<select id="selectUser" resultMap="User">
+			select * from user where user_name = #{0}
+			and user_area=#{1}
+		</select>
+
+	2.使用 @param 注解
+		public User selectUser(@Param("name") String name,@Param("area") String area);
+		<select id="selectUser" resultMap="User">
+			select * from user where user_name = #{name}
+			and user_area=#{area}
+		</select>
+
+8）Mabatis动态SQL有什么用？执行原理？有哪些动态SQL？
+	Mybatis动态SQL可以在xml映射文件内，以标签的形式编写动态SQL，执行原理是根据表达式的值，完成逻辑判断并动态拼接SQL的功能。
+	9种动态SQL标签： trim | where | set | foreach | if | choose | when | therwise | bind
+
+9）xml映射文件标签？
+	<resultMap>、<parameterMap>、<sql>、<include>、<selectKey>
+
+10）一对一、一对多的关联查询？
+	<mapper namespace="com.lcb.mapping.userMapper">
+		<!--association 一对一关联查询 一个班一个老师-->
+		<select id="getClass" parameterType="int" resultMap="ClassesResultMap">
+			select * from 
+			class c,teacher t 
+			where c.teacher_id=t.t_id 
+			and c.c_id=#{id}
+		/select>
+		<resultMap type="com.lcb.user.Classes" id="ClassesResultMap">
+			<!-- 实体类的字段名和数据表的字段名映射 -->
+			<id property="id" column="c_id"/>
+			<result property="name" column="c_name"/>
+			<association property="teacher" javaType="com.lcb.user.Teacher">
+				<id property="id" column="t_id"/>
+				<result property="name" column="t_name"/>
+			</association>
+		</resultMap>
+
+		<!--collection 一对多关联查询 一个班一个老师，n个学生-->
+		<select id="getClass2" parameterType="int" resultMap="ClassesResultMap2">
+			select * from 
+			class c,teacher t,student s 
+			where c.teacher_id=t.t_id
+			and c.c_id=s.class_id 
+			and c.c_id=#{id}
+		</select>
+		<resultMap type="com.lcb.user.Classes" id="ClassesResultMap2">
+			<id property="id" column="c_id"/>
+			<result property="name" column="c_name"/>
+			<association property="teacher" javaType="com.lcb.user.Teacher">
+				<id property="id" column="t_id"/>
+				<result property="name" column="t_name"/>
+			</association>
+			<collection property="student" ofType="com.lcb.user.Student">
+				<id property="id" column="s_id"/>
+				<result property="name" column="s_name"/>
+			</collection>
+		</resultMap>
+	</mapper>
+
+11）延迟加载,按需加载？
+	https://www.cnblogs.com/ashleyboy/p/9286814.html
+	<settings>
+    	<!-- 启用延迟加载特性，不配置默认关闭该特性-->
+    	<setting name="lazyLoadingEnabled" value="true"></setting>
+    	<!-- 按需加载: false:使用关联属性，及时加载;    true,加载对象，则加载所有属性， -->
+     	<setting name="aggressiveLazyLoading" value="false"/>
+    </settings>
+    原理：CGLIB代理
+
+12）一级、二级缓存
+	1.一级缓存是SqlSession级别的缓存。在操作数据库时需要构造sqlSession对象。
+	用户发起查询请求，查找某条数据，sqlSession先去缓存中查找，是否有该数据，如果有，读取；
+	如果没有，从数据库中查询，并将查询到的数据放入一级缓存区域，供下次查找使用。
+	但sqlSession执行commit，即增删改操作时会清空缓存。这么做的目的是避免脏读。
+
+	2.二级缓存是mapper级别的缓存，多个SqlSession去操作同一个Mapper的sql语句，多个SqlSession可以共用二级缓存，二级缓存是跨SqlSession的。
+
+13）Mybatis接口绑定？实现方式？
+	接口绑定，就是在 MyBatis 中任意定义接口,然后把接口里面的方法和 SQL 语句绑定, 我们直接调用接口方法就可。
+	接口绑定有两种实现方式,一种是通过 注解绑定 ，就是在接口的方法上面加上@Select、@Update 等注解，里面包含 Sql 语句来绑定；另外一种就是通过 xml里面写 SQL 来绑定, 在这种情况下,要指定 xml 映射文件里面的 namespace 必须为接口的全路径名。当 Sql 语句比较简单时候,用注解绑定, 当 SQL 语句比较复杂时候,用 xml 绑定,一般用 xml 绑定的比较多。
+
+14）使用 MyBatis 的 mapper 接口调用时有哪些要求？
+	（1）Mapper 接口方法名和 mapper.xml 中定义的每个 sql 的 id 相同；
+	（2）Mapper 接口方法的输入参数类型和 mapper.xml 中定义的每个 sql 的parameterType 的类型相同；
+	（3）Mapper 接口方法的输出参数类型和 mapper.xml 中定义的每个 sql 的resultType 的类型相同；
+	（4）Mapper.xml 文件中的 namespace 即是 mapper 接口的类路径。
