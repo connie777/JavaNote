@@ -1,0 +1,24 @@
+设计模式六大原则：
+	1）单一职责
+	2）开闭原则 扩展开发，修改关闭
+	3）依赖倒置 抽象不应该依赖细节，细节依赖于抽象。面向接口编程
+	4）里式替换 子类型必须能够完全替代父类型
+	5）合成复用 不要过多的依赖继承，尽量使用合成或聚合
+	6）迪米特原则 
+
+简单工厂，工厂，抽象工厂
+单例（懒汉，饿汉）
+	public class HungrySingleton {
+	    /** 私有化类构造器 */
+	    private HungrySingleton() {}
+
+	    /** 定义静态私有类对象 */
+	    private static HungrySingleton instance = new HungrySingleton();
+
+	    /** 提供公共静态的获取该私有类对象的方法 */
+	    public static HungrySingleton getInstance() {
+	        return instance;
+	    }
+	}
+
+	
