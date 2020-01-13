@@ -1,12 +1,126 @@
 1.冒泡排序（Bubble Sort）
+	https://mp.weixin.qq.com/s?__biz=MzIxMjE5MTE1Nw==&mid=2653194666&idx=1&sn=69ce32870c0b981c40b1e124fbb6bba8&chksm=8c99fb70bbee72668cad223892ad362525d215e7f936458f99dd289eb82981099359310e9e54&scene=21#wechat_redirect
 
-2.插入排序
+	/**
+	 * 冒泡排序1
+	 * @param arr
+	 */
+	public static void bubbleSort1(int[] arr) {
+		int temp;
+		int length=arr.length;
+		//外层控制冒泡次数
+		for(int i=0;i<length-1;i++) {
+			//内层进行比较
+			for(int j=0;j<length-i-1;j++) {
+				if(arr[j]>arr[j+1]) {
+					temp=arr[j+1];
+					arr[j+1]=arr[j];
+					arr[j]=temp;
+				}
+			}
+		}
+		Arrays.toString(arr);
+	}
+	/**
+	 * 冒泡排序优化优化2（如果已经有序，提前结束循环）
+	 * @param arr
+	 */
+	public static void bubbleSort2(int[] arr) {
+		//是否有序，默认为true。如果在一轮比较过程中，一次元素交换都没有，说明已经有序
+		boolean flag=true;
+		int length=arr.length;
+		int temp;
+		for(int i=0;i<length-1;i++) {
+			for(int j=0;j<length-i-1;j++) {
+				if(arr[j]>arr[j+1]) {
+					temp=arr[j];
+					arr[j]=arr[j+1];
+					arr[j+1]=temp;
+					//有元素交换，说明不是有序
+					flag=false;
+				}
+			}
+			if(flag) {
+				break;
+			}
+		}
+		Arrays.toString(arr);
+	}
+	
+	/**
+	 * 冒泡优化3（优化有序临界点）
+	 * @param arr
+	 */
+	public static void bubbleSort3(int[] arr) {
+		int length=arr.length;
+		int temp=0;
+		boolean isSorted=true;
+		int sortBorder=length-1;//无序数列边界,每次比较只需要比到这里为止
+		int lastExchangeIndex=0;//记录最后一次交换的位置
+		for(int i=0;i<length-1;i++) {
+			for(int j=0;j<sortBorder;j++) {
+				if(arr[j]>arr[j+1]) {
+					temp=arr[j];
+					arr[j]=arr[j+1];
+					arr[j+1]=temp;
+					//有元素交换，所以不是有序，标记变为false
+					isSorted=false;
+					//把无序数列的边界更新为最后一次交换元素的位置
+					lastExchangeIndex=j;
+				}
+			}
+			sortBorder=lastExchangeIndex;
+			if(isSorted) {
+				break;
+			}
+		}
+		Arrays.toString(arr);
+	}
 
-3.快速排序
+2.选择排序
+	/**
+	 * 选择排序
+	 * @param arr
+	 */
+	public static void selectionSort(int[] arr) {
+		//外层循环是比较数 i [0,length-1]
+		for(int i=0;i<arr.length-1;i++) {
+			//内层循环是被比较数 j [i+1,length]
+			for(int j=i+1;j<arr.length;j++) {
+				int temp;
+				if(arr[i]>arr[j]) {
+					temp=arr[i];
+					arr[i]=arr[j];
+					arr[j]=temp;
+				}
+			}
+		}
+		System.out.println(Arrays.toString(arr));
+	}
 
-4.堆排序
+3.二分查找（Binary Search）
 
-5.归并排序
+	/**
+	 * 二分查找
+	 * @param target
+	 * @param arr
+	 */
+	public static int binarySearch(int target,int[] arr) {
+		int left=0;
+		int right=arr.length-1;
+		
+		while(arr[left]<=arr[right]) {
+			int middle=(left+right)/2;
+			if(target>arr[middle]) {
+				left=middle+1;
+			}
+			if(target<arr[middle]) {
+				right=middle-1;
+			}else {
+				return middle;
+			}
+		}
+		return -1;
+	}
 
-2.二分查找（Binary Search）
-
+（插入排序 快速排序 排序 归并排序）
