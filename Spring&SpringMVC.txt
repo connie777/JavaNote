@@ -78,3 +78,7 @@
 	（9）ViewResolver解析后返回具体View；
 	（10）DispatcherServlet对View进行渲染视图（即将模型数据填充至视图中）
 	（11）DispatcherServlet响应用户。
+
+11.forward与redirect区别
+	（1）redirect又称重定向，会发送2次HTTP请求，对应两个request，无法共享request域的attribute；浏览器的地址栏URL会变，可以防止f5刷新页面重复提交表单；可用于登陆注销页面跳转
+	（2）forward性能优于redirect，只发送一次HTTP请求，可以共享request域的attribute；地址栏URL不变。
