@@ -1,0 +1,4 @@
+1.Dubbo与Spring Cloud区别
+	dubbo基于RPC远程调用
+	cloud基于http rest api 调用
+	cloud提供了一整套微服务的解决方案
