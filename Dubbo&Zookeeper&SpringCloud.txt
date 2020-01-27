@@ -32,3 +32,23 @@
 	3）Hystrix 断路器  发起请求是通过Hystrix的线程池来走的，不同的服务走不同的线程池，实现了不同服务调用的隔离，避免了服务雪崩的问题
 	4）zuul网关  统一从Zuul网关进入，由Zuul网关转发请求给对应的服务
 	5）config server  可以将配置文件放在git服务器上，config server读取git，config client 读取 config server
+
+4.springboot中的常用注解
+	1）@Configuration @Bean
+		带有@Configuration的注解类表示这个类可以使用Spring IOC容器作为bean定义的来源。
+		@Bean注解告诉Spring，一个带有@Bean的注解方法将返回一个对象，该对象应该被注册为在Spring应用程序上下文中的bean。方法名称为bean的id
+
+	2）@ControllerAdvice 标注类为异常处理类
+		@ExceptionHandle（value=Exception.class)标注的方法处理特定的异常
+		例：		@ControllerAdvice
+				//异常处理
+				public class BaseExceptionHandler {
+				    @ExceptionHandler(value = Exception.class)
+				    @ResponseBody
+				    public Result error(Exception e){
+				        e.printStackTrace();
+				        return new Result(false, StatusCode.ERROR,e.getMessage());
+				    }
+				}
+
+	3) @CrossOrigin  跨域
