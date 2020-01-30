@@ -52,3 +52,21 @@
 				}
 
 	3) @CrossOrigin  跨域
+
+	4）赋值注解
+		@ConfigurationProperties 适合配置文件与javabean批量映射
+		@Value 适合单个赋值
+
+
+服务发现——Netflix Eureka
+服务调用——Netflix Feign
+熔断器——Netflix Hystrix
+服务网关——Netflix Zuul
+分布式配置——Spring Cloud Config
+消息总线—— Spring Cloud Bus
+
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+</dependency>
+

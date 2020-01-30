@@ -128,3 +128,11 @@ SpringDataRedis
         }
 		return article;
 	}
+
+SpringDataMongoDB
+
+	DAO:
+		public interface SpitDao extends MongoRepository<Spit,String> {
+
+		    public Page<Spit> findByParentid(String parentid, Pageable pageable);
+		}

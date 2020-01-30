@@ -7,7 +7,7 @@
 	2）work队列:一个生产者，多个消费者，一个消息只能被一个消费者消费
 		轮询分发：每个消费者获得相同数量的消息
 		公平分发（能者多劳）：联合使用 Qos 和 Acknowledge，basicQos 方法设置当前信道最大预获取（prefetch）消息数量，关闭自动应答，改为手动应答
-	3）Publish/Subscribe（发布/订阅）：  无交换机
+	3）Publish/Subscribe（发布/订阅）：  fanout
 		一个生产者，多个消费者
 		每一个消费者都有自己的一个队列
 		生产者没有将消息直接发送到队列，而是发送到了交换机
@@ -34,3 +34,5 @@
 	1.fanout 将消息发送到所有与它绑定的队列中
 	2.direct 把消息路由到哪些binding key 与 routing key 完全匹配的队列
 	3.topic	将消息路由到binding key 与 routing key 想匹配的队列（通配符）
+
+docker run -di --name=mq -p 5671:5671 -p 5672:5672 -p 4369:4369 -p 15671:15671 -p 15672:15672 -p 25672:25672 rabbitmq:management

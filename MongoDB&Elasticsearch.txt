@@ -1,0 +1,103 @@
+1.关系型数据库与非关系型数据库
+	表与表之间是否有关系
+
+2.MongoDB 特点
+	数据量大
+	写入操作频繁
+	数据价值低
+
+3.什么是MongoDB
+	非关系型数据库
+	面向文档的数据库，文档对应数据库一条记录
+	支持的数据结构是类似json的 BSON
+
+4.体系结构
+	文档（document）  对应  行（row）
+	集合（collection）		表（table）
+	数据库（database）		数据库
+
+5.数据类型
+	null:  {"x":null}
+	布尔型： {"x":true}
+	数值：  默认使用64位浮点型整数  {"x":3.14} 或  {"x":3}
+			对于整型值，可以使用 {"x":NumberInt("3")}   {"x":NumberLong("3")}
+	字符串	{"x":"呵呵"}
+	日期		{"x":new Date()}
+	数组		{"x":["a","b","c"]}
+
+6.数据库的主键为_id
+
+7.支持增加、删除、修改、查询、计数（count）、按条件计数、模糊查询（通过正则表达式）、复杂查询、列值增长
+
+
+
+ElasticSearch
+
+分布式搜索引擎
+
+java操作端口为9300
+其他客户端操作端口为9200
+
+
+体系结构
+Elasticsearch     MySQL
+索引（index）		数据库（database）
+类型（type） 		表（table）
+文档（document）		行（row）
+
+可以用restful HTTP请求操作es
+
+head插件
+	需要安装node.js
+	端口 9100
+	需要配置跨域
+	启动命令 grunt server
+
+IK分词器
+将IK的包放入ES的plugin目录中
+IK提供两个分词算法ik_smart和ik_max_word
+ik_smart为最少切分，ik_max_word为最细粒度划分
+			"我是程序员"
+ik_smart：	"我" "是"  "程序员"
+ik_max_word： "我" "是"  "程序员"  "程序"  "员"
+
+自定义词库
+	1.在IK的config目录中，新增一个dic文件，将词汇写入，
+	2.在IKAnalyzer.cfg.xml中配置dic文件，重启ES
+
+SpringDataES
+
+	@Document(indexName = "tensuare",type = "article")
+	public class Article implements Serializable {
+	    @Id
+	    private String id;
+
+	    //是否所以，就是看该域是否能被搜索
+	    //是否分词，就表示搜索的时候是整体匹配还是单词匹配
+	    //是否存储，就是是否在页面上显示
+	    @Field(index=true,analyzer = "ik_max_word",searchAnalyzer = "ik_max_word")
+	    private String title;
+
+	    @Field(index=true,analyzer = "ik_max_word",searchAnalyzer = "ik_max_word")
+	    private String content;
+	}
+
+	public interface ArticleSearchDao extends ElasticsearchRepository<Article,String> {
+	    public Page<Article> findByTitleOrContentLike(String title, String content,
+	                                                  Pageable pageable);
+	}
+
+
+logstash实现ES与MySQL数据同步
+	需要编写mysql.conf配置文件，准备mysql-java驱动包
+	启动：logstash -f ../mysqletc/mysql.conf
+	数据同步特征：mysql中删除的数据不会同步到索引库（ES)中，可以通过改变状态来实现逻辑删除
+
+docker运行 ES容器、添加IK分词器插件，运行HEAD插件容器
+
+docker run -di --name=tensquare_es -p 9200:9200 -p 9300:9300 elasticsearch:5.6.8
+文件挂载：后面容器中的文件挂载到宿主机中的文件
+docker run -di --name=ES -p 9200:9200 -p 9300:9300 -v /usr/share/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml -e ES_JAVA_OPTS="-Xms=256m -Xms=256m" elasticsearch:5.6.8
+
+
+docker run -di --name=myHead -p 9100:9100 mobz/elasticsearch-head:5
