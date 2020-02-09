@@ -31,3 +31,6 @@ docker rmi image_name 删除镜像
 docker rm container_name/container_id ，需要先停止容器，删除容器
 
 DockerFile :用来构建Docker镜像的构建文件，是由一系列命令和参数构成的脚本
+
+构建命令： 构建名称为jdk1.8的镜像， '.' 不能省略
+docker build -t='jdk1.8' .

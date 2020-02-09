@@ -39,5 +39,3 @@ JWT组成
 2.用户进行删除、新增操作时，通过interceptor拦截器读取header头中的token信息，并将token的角色信息存入request（request.setAttribute)
 3.在具体业务中，通过request中的角色信息进行鉴权。（request.getAttribute)
 
-@ConfigurationProperties 适合配置文件与javabean批量映射
-@Value 适合单个赋值

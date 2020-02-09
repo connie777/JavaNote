@@ -65,8 +65,54 @@
 分布式配置——Spring Cloud Config
 消息总线—— Spring Cloud Bus
 
-<dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-</dependency>
+雪崩效应：
+	A作为服务提供者，B为A的服务消费者，C和D是B的服务消费者。A不可用引起B的不可用，并将不可用像滚雪球一样放大到C和D，从而形成雪崩效应。
+	Hystrix实现熔断器，避免雪崩效应
 
+feign默认具有负载均衡功能，同一生产者服务的集群，只需配置spring.application.name相同，port不同即可
+
+feign本身支持hystrix,只需在配置文件中开启：feign.hystrix.enabled=true
+	编写FeignClient 的实现类，并在注解@FeignClient 添加属性FallBack
+	@FeignClient(value = "tensquare-base",fallback = BaseClientImpl.class)
+	public interface BaseClient {
+	    @RequestMapping(value = "/label/{labelId}",method = RequestMethod.GET)
+	    public Result findById(@PathVariable("labelId") String labelId);
+	}
+
+zuul网关
+	可以通过网关来访问微服务，不用记住每个微服务的域名，端口，路径
+	通过路径映射到对应的微服务
+	启动类加注解@EnableZuulProxy，网关微服务也需要注册到eureka
+	配置文件添加映射配置
+		zuul:
+		  routes:
+		    tensquare-gathering:    #活动
+		      path: /gathering/**   #配置请求URL的请求规则
+		      serviceId: tensquare-gathering  #指定Eureka注册中心中的服务id
+
+经过网关后，request请求的header头信息会丢失
+
+可以在zuul filter 转发请求头信息
+简单的鉴权
+
+Spring Cloud Config
+	把所有服务的配置文件都放在一个代码托管平台上（gitlab，gitee）
+	通过该服务去读取对应微服务所需的配置文件
+	可以将大部分配置文件放到云端，方便后期维护
+
+Spring Cloud Bus
+	不重启微服务的情况下，更新配置文件，立刻生效
+	步骤：
+		修改配置文件后，往配置微服务发送一个post请求，例：http://127.0.0.1:12000/actuator/bus-refresh 
+		最后的bus-refresh 可以在配置微服务中配置：
+			management: #暴露触发消息总线的地址
+			  endpoints:
+			    web:
+			      exposure:
+			        include: bus-fresh
+
+	原理：修改配置文件后，发送指定post请求都config server，config server 往rabbitmq中发送消息，config client 接收消息，重新从config server读取配置信息
+
+	config client 需要引入bus、rabbitmq、springboot-actuator依赖，config server只需前两个
+
+	自定义配置的更新：在需要读取配置信息的java bean 上添加注解：@RefreshScope
