@@ -1,11 +1,11 @@
 SpringDataJpa
 
-单表查询用tpql或方法命名
+单表查询用jpql或方法命名
 多表用sql
 dao:
 	public interface LabelDao extends JpaRepository<Label,String>, JpaSpecificationExecutor<Label> {}
 
-tpql
+jpql
 service:
 	@Service
 	@Transactional

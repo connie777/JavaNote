@@ -25,7 +25,10 @@ System.out.println(MessageFormat.format(str, "不言","成蹊"));
 
 2019-12-25
 
-4.集合
+4.集合  
+
+脑图  https://www.processon.com/mindmap/5e3fa3c5e4b00de9fd81d7f3
+
 数组元素既可以是基本类型的值，也可以是对象（对象的应用变量），长度固定
 集合只能保存对象,基本类型会自动装箱成包装类
 

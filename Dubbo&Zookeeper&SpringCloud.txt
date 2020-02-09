@@ -111,7 +111,7 @@ Spring Cloud Bus
 			      exposure:
 			        include: bus-fresh
 
-	原理：修改配置文件后，发送指定post请求都config server，config server 往rabbitmq中发送消息，config client 接收消息，重新从config server读取配置信息
+	原理：修改配置文件后，发送指定post请求给config server，config server 往rabbitmq中发送消息，config client 接收消息，重新从config server读取配置信息
 
 	config client 需要引入bus、rabbitmq、springboot-actuator依赖，config server只需前两个
 
