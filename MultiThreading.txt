@@ -1,0 +1,102 @@
+线程创建的方式：
+	1.继承Thread类
+	2.实现Runnable接口
+	3.实现Callable接口 可以提供一个返回值
+		FutureTask<String> task=new FutureTask<String>(new Callable<String>() {
+			@Override
+			public String call() throws Exception {
+				//执行逻辑
+				return "";
+			}
+		});
+		new Thread(task).start();
+
+	4.线程池
+
+线程池类型 https://www.cnblogs.com/superfj/p/7544971.html
+	
+	keepAliveTime :表示线程没有任务时最多保持多久然后停止。默认情况下，只有线程池中线程数大于corePoolSize 时，keepAliveTime 才会起作用。换句话说，当线程池中的线程数大于corePoolSize，并且一个线程空闲时间达到了keepAliveTime，那么就是shutdown。
+
+	workQueue ：一个阻塞队列，用来存储等待执行的任务，当线程池中的线程数超过它的corePoolSize的时候，线程会进入阻塞队列进行阻塞等待。
+	workQueue的类型为BlockingQueue<Runnable>，通常可以取下面三种类型：
+
+		1）有界任务队列ArrayBlockingQueue：基于数组的先进先出队列，此队列创建时必须指定大小；
+
+		2）无界任务队列LinkedBlockingQueue：基于链表的先进先出队列，如果创建时没有指定此队列大小，则默认为Integer.MAX_VALUE；
+
+		3）直接提交队列synchronousQueue：这个队列比较特殊，它不会保存提交的任务，而是将直接新建一个线程来执行新来的任务。
+
+	1.newFixedThreadPool(int nThreads)  定长线程池
+	corePoolSize=maximumPoolSize  阻塞队列为LinkedBlockingQueue
+
+	底层代码：
+	public static ExecutorService newFixedThreadPool(int nThreads) {
+        return new ThreadPoolExecutor(nThreads, nThreads,
+                                      0L, TimeUnit.MILLISECONDS,
+                                      new LinkedBlockingQueue<Runnable>());
+    }
+
+    实例：
+    ExecutorService eService=Executors.newFixedThreadPool(10);
+	for(int i=0;i<11;i++) {
+		//从线程池中取出一个线程执行任务
+		eService.execute(new Runnable() {
+			@Override
+			public void run() {
+				for(int i=0;i<10;i++) {
+				System.out.println(Thread.currentThread().getName());
+				}
+			}
+		});
+	}
+
+	2.newCachedThreadPool() 缓存线程池
+	corePoolSize=0  maximumPoolSize=Integer.MAX_VALUE  缓存的线程默认存活60秒  阻塞队列使用的是SynchronousQueue
+	是一个直接提交的阻塞队列 他总会迫使线程池增加新的线程去执行新的任务。在没有任务执行时，当线程的空闲时间超过keepAliveTime（60秒），则工作线程将会终止被回收，当提交新任务时，如果没有空闲线程，则创建新线程执行任务，会导致一定的系统开销。如果同时又大量任务被提交，而且任务执行的时间不是特别快，那么线程池便会新增出等量的线程处理任务，这很可能会很快耗尽系统的资源。
+
+	底层代码：
+	public static ExecutorService newCachedThreadPool(ThreadFactory threadFactory) {
+        return new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+                                      60L, TimeUnit.SECONDS,
+                                      new SynchronousQueue<Runnable>(),
+                                      threadFactory);
+    }
+
+    3.newSingleThreadExector()
+    单个线程线程池，只有一个线程的线程池，阻塞队列使用的是LinkedBlockingQueue,若有多余的任务提交到线程池中，则会被暂存到阻塞队列，待空闲时再去执行。按照先入先出的顺序执行任务。
+
+    public static ExecutorService newSingleThreadExecutor() {
+        return new FinalizableDelegatedExecutorService
+            (new ThreadPoolExecutor(1, 1,
+                                    0L, TimeUnit.MILLISECONDS,
+                                    new LinkedBlockingQueue<Runnable>()));
+    }
+
+    4.newScheduledThreadPool(int corePoolSize)  定时线程池
+    可以指定核心线程池大小
+    每个任务会定时执行
+    分2种定时：  1.scheduleAtFixedRate(Runnable command,long initialDelay,long period,TimeUnit unit) 固定频率，不考虑任务的执行时长
+    			2.scheduleWithFixedDelay(Runnable command,long initialDelay,long delay,TimeUnit unit) 固定延迟，考虑任务时长
+
+
+    public static ScheduledExecutorService newScheduledThreadPool(int corePoolSize) {
+        return new ScheduledThreadPoolExecutor(corePoolSize);
+    }
+
+    实例：
+    ScheduledExecutorService service=Executors.newScheduledThreadPool(10);
+	service.scheduleAtFixedRate(new Runnable() {
+		
+		@Override
+		public void run() {
+			System.out.println("1");
+			
+		}
+	}, 0, 1, TimeUnit.SECONDS);//效果：一个线程执行：每隔1秒输出一个1
+
+线程的5种状态
+	1.新建（new Thread)
+	2.就绪（runnable)
+	3.运行（running）
+	4.阻塞（blocked）
+	5.死亡（dead）

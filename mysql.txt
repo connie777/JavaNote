@@ -46,3 +46,23 @@ MySQL中InnoDB引擎的行锁实现
 InnoDB基于索引来完成行锁。
 例：SELECT * FROM pr_user WHERE id = 1 FOR UPDATE
 FOR UPDATE 可以根据条件来完成行锁锁定，并且id是有索引的列
+
+7.存储过程
+优点：
+	1.一次创建，多次调用
+	2.执行更快
+	3.更安全
+
+create procedure 过程名(参数列表)
+begin
+	SQL 语句代码块
+end
+
+8.性能优化：
+	Not Exists 代替 Not in
+	对操作符优化，尽量不采用不利于索引的操作符，如：in，not in，is null ，is not null，<> 等
+
+9.分库分表
+	垂直切分：将表按照功能模块、关系密切程度划分出来，部署到不同的库上。如定义 商品数据库goodsDB、用户数据库userDB、日志数据库logDB
+
+	水平切分：当一个表中的数据量过大时，可以把该表的数据按照某种规则，例如userID散列，进行划分，然后存储到多个结构相同的表和不同的库上。如将userDB切分为结构相同的多个userDB：part0DB、part1DB等，再将userDB上的用户数据表userTable，切分为userTable0、userTable1等，再按照一定规则存储到多个userDB上。

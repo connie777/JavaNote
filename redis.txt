@@ -25,3 +25,41 @@
 	1）RDB (Redis DataBase):在不同的时间点将redis的数据生成的快照同步到磁盘等介质上。内存到磁盘的快照，定期更新。缺点：耗时，耗性能，易丢失数据
 	2）AOF（Append Only File）：将redis所执行过的所有指令都记录下来，在下次redis重启时，只需要执行指令就可以了；写日志。缺点：体积大，恢复速度慢。
 
+9.redis集群
+	https://blog.csdn.net/qq_38174263/article/details/86147380
+	https://blog.csdn.net/miss1181248983/article/details/90056960
+
+	1）基本的主从，redis启动后默认是master（主）角色
+
+		创建2个redis服务，端口为 7501 7502，完成后2台都是master服务
+		在7502输入命令： slaveof 127.0.0.1 7501
+		7502就成为了7501的slave（从）服务
+		
+		特点：读写分离，主redis可正常读写，从redis只能读
+		不具备高可用性，当master挂掉以后，Redis将不能再对外提供写入操作
+
+	2）Sentinel模式（哨兵），基于主从  高可用
+		7501 主redis，7502 从redis ，7503,7504,7505三个哨兵
+		当7501挂了后，7502会自动成为主节点；当7501恢复后，自动成为从节点
+
+		常用命令
+				redis-cli -h 127.0.0.1 -p 7501
+				info  replication （redis中的命令，查看主从信息）
+				哨兵启动命令： redis-server /etc/redis-sentinel/redis-7505/redis.conf --sentinel
+		哨兵也是redis服务，配置文件示例：
+			#后台启动
+			daemonize yes 
+			port 7505
+			#指定工作目录
+			dir ./
+			logfile "./sentinel.log" 
+			 
+			#指定别名  主节点地址  端口  哨兵个数（有几个哨兵监控到主节点宕机执行转移）
+			sentinel monitor mymaster 127.0.0.1 7501 2
+			 
+			#如果哨兵3s内没有收到主节点的心跳，哨兵就认为主节点宕机了，默认是30秒  
+			sentinel down-after-milliseconds mymaster 3000
+			 
+		mymaster 后跟的是master的ip和端口，最后一个'2'代表我要启动只要有2个sentinel认为master下线，就认为该master客观下线，启动failover并选举产生新的master。通常最后一个参数不能多于启动的sentinel实例数。建议至少启动三台sentinel实例。
+ 
+
