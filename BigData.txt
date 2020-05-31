@@ -1,0 +1,23 @@
+1.大数据的作用：处理海量数据的存储和分析计算
+2.特点： 
+	Volume (数据量大量) TB < PB < EB
+	Velocity  (数据产生高速)
+	Variety (数据多样) 分为结构化、半结构化和非结构化
+	Value	低价值密度  价值密度高低与数据总量的大小成反比
+
+Hadoop由 HDFS(数据存储) YARN(资源调度) MapReduce(计算) Common(辅助工具) 组成
+
+	HDFS
+		1.NameNode
+		2.DataNode
+		3.Secondary NameNode
+
+	YARN
+		1.ResourceManager 
+		2.NodeManager
+		3.ApplicationMaster
+		4.Container
+
+	MapReduce 
+	 	1.Map 并行处理数据
+	 	2.Reduce 对Map结果进行汇总 
